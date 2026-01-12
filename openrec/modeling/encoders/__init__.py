@@ -20,6 +20,7 @@ name_to_module = {
     'ResNet_ASTER': '.resnet31_rnn',
     'SVTRv2LNConv': '.svtrv2_lnconv',
     'SVTRv2LNConvTwo33': '.svtrv2_lnconv_two33',
+    'SVTRv2Mamba': '.svtrv2_mamba',
     'CAMEncoder': '.cam_encoder',
     'ConvNeXtV2': '.convnextv2',
     'AutoSTREncoder': '.autostr_encoder',
