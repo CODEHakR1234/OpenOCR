@@ -37,7 +37,10 @@ class RecGTCMetric(object):
                  training=False,
                  *args,
                  **kwargs):
-
+        # infer_gtc=False면 ctc만 반환됨 (list가 아님)
+        if not isinstance(pred_label, list):
+            ctc_metric = self.ctc_metric(pred_label, batch, training=training)
+            return ctc_metric
         ctc_metric = self.ctc_metric(pred_label[1], batch, training=training)
         gtc_metric = self.gtc_metric(pred_label[0], batch, training=training)
         ctc_metric['gtc_acc'] = gtc_metric['acc']
@@ -53,6 +56,8 @@ class RecGTCMetric(object):
         """
         ctc_metric = self.ctc_metric.get_metric()
         gtc_metric = self.gtc_metric.get_metric()
-        ctc_metric['gtc_acc'] = gtc_metric['acc']
-        ctc_metric['gtc_norm_edit_dis'] = gtc_metric['norm_edit_dis']
+        # gtc_metric에 값이 있을 때만 추가
+        if gtc_metric.get('acc', 0) > 0 or gtc_metric.get('norm_edit_dis', 0) > 0:
+            ctc_metric['gtc_acc'] = gtc_metric['acc']
+            ctc_metric['gtc_norm_edit_dis'] = gtc_metric['norm_edit_dis']
         return ctc_metric

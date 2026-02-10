@@ -439,6 +439,7 @@ class DASSMBlock(nn.Module):
         drop=0.0,
         drop_path=0.0,
         act_layer=nn.GELU,
+        d_state=1,  # SSM state dimension (default=1, can increase for more capacity)
         **kwargs
     ):
         super().__init__()
@@ -448,7 +449,7 @@ class DASSMBlock(nn.Module):
         
         # Token mixer
         self.norm1 = LayerNorm2d(dim)
-        self.token_mixer = DASSM(dim, head_dim=head_dim, dropout=drop)
+        self.token_mixer = DASSM(dim, head_dim=head_dim, d_state=d_state, dropout=drop)
         
         # FFN
         self.norm2 = nn.BatchNorm2d(dim)
@@ -624,7 +625,8 @@ class SVTRStage(nn.Module):
                  kernel_sizes=[3] * 3, sub_k=[2, 1], num_heads=2, head_dim=16,
                  mlp_ratio=4, qkv_bias=True, qk_scale=None, drop_rate=0.0,
                  attn_drop_rate=0.0, drop_path=[0.1] * 3, norm_layer=nn.LayerNorm,
-                 act=nn.GELU, eps=1e-6, num_conv=[2] * 3, downsample=None, **kwargs):
+                 act=nn.GELU, eps=1e-6, num_conv=[2] * 3, downsample=None, 
+                 d_state=1, **kwargs):
         super().__init__()
         self.dim = dim
         self.mixer_types = mixer
@@ -641,7 +643,8 @@ class SVTRStage(nn.Module):
             elif mixer[i] in ['Mamba', 'FMamba']:
                 self.blocks.append(DASSMBlock(
                     dim=dim, head_dim=head_dim, mlp_ratio=mlp_ratio,
-                    drop=drop_rate, drop_path=drop_path[i], act_layer=act))
+                    drop=drop_rate, drop_path=drop_path[i], act_layer=act,
+                    d_state=d_state))
             
             elif mixer[i] == 'Global':
                 self.blocks.append(Block(
@@ -784,6 +787,7 @@ class SVTRv2Mamba(nn.Module):
                  num_convs=[[2] * 3, [2] * 3 + [3] * 3, [3] * 3],
                  kernel_sizes=[[3] * 3, [3] * 3 + [3] * 3, [3] * 3],
                  pope_bias=False,
+                 d_state=1,  # SSM state dimension for Mamba blocks
                  **kwargs):
         super().__init__()
         num_stages = len(depths)
@@ -829,6 +833,7 @@ class SVTRv2Mamba(nn.Module):
                 eps=eps,
                 num_conv=num_convs[i_stage] if len(num_convs[i_stage]) == len(mixer[i_stage]) 
                          else [2] * len(mixer[i_stage]),
+                d_state=d_state,  # Pass d_state to Mamba blocks
             )
             self.stages.append(stage)
 

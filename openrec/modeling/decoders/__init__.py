@@ -63,15 +63,20 @@ class GTCDecoder(nn.Module):
         super(GTCDecoder, self).__init__()
         self.detach = detach
         self.infer_gtc = infer_gtc
-        if infer_gtc:
-            gtc_decoder['out_channels'] = out_channels[0]
-            ctc_decoder['out_channels'] = out_channels[1]
-            gtc_decoder['in_channels'] = in_channels
-            ctc_decoder['in_channels'] = in_channels
-            self.gtc_decoder = build_decoder(gtc_decoder)
+        # out_channels 처리: 튜플이면 [gtc, ctc] 형태
+        if isinstance(out_channels, (list, tuple)):
+            gtc_out_channels = out_channels[0]
+            ctc_out_channels = out_channels[1]
         else:
-            ctc_decoder['in_channels'] = in_channels
-            ctc_decoder['out_channels'] = out_channels
+            gtc_out_channels = out_channels
+            ctc_out_channels = out_channels
+        # GTC decoder는 학습용으로 항상 생성
+        gtc_decoder['out_channels'] = gtc_out_channels
+        gtc_decoder['in_channels'] = in_channels
+        self.gtc_decoder = build_decoder(gtc_decoder)
+        # CTC decoder
+        ctc_decoder['in_channels'] = in_channels
+        ctc_decoder['out_channels'] = ctc_out_channels
         self.ctc_decoder = build_decoder(ctc_decoder)
 
     def forward(self, x, data=None):
@@ -82,7 +87,8 @@ class GTCDecoder(nn.Module):
                                         data=data)
             return {'gtc_pred': gtc_pred, 'ctc_pred': ctc_pred}
         else:
-            return ctc_pred
+            # infer_gtc=False면 CTC만 사용, 하지만 dict 형태로 반환
+            return {'ctc_pred': ctc_pred}
 
 
 class GTCDecoderTwo(nn.Module):

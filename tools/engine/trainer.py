@@ -145,7 +145,7 @@ class Trainer(object):
                 self.model, [self.local_rank], find_unused_parameters=False)
 
         # amp
-        self.scaler = (torch.amp.GradScaler() if self.cfg['Global'].get(
+        self.scaler = (torch.cuda.amp.GradScaler() if self.cfg['Global'].get(
             'use_amp', False) else None)
 
         self.logger.info(
@@ -332,7 +332,7 @@ class Trainer(object):
                 # use amp
                 if self.scaler:
                     with torch.amp.autocast(device_type=self.device.type,
-                                            dtype=torch.bfloat16):
+                                            dtype=torch.float16):
                         if self.use_transformers:
                             inputs = {
                                 'pixel_values': batch_tensor[0],

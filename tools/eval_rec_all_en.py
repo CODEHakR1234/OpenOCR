@@ -53,15 +53,16 @@ def main():
 
     data_dirs_list = [
         [
-            '../test/IIIT5k/', '../test/SVT/', '../test/IC13_857/',
-            '../test/IC15_1811/', '../test/SVTP/', '../test/CUTE80/'
+            '../evaluation/IIIT5k/', '../evaluation/SVT/', '../evaluation/IC13_857/',
+            '../evaluation/IC15_1811/', '../evaluation/SVTP/', '../evaluation/CUTE80/'
         ],
         [
             '../u14m/curve/', '../u14m/multi_oriented/', '../u14m/artistic/',
             '../u14m/contextless/', '../u14m/salient/', '../u14m/multi_words/',
             '../u14m/general/'
-        ], ['../OST/weak/', '../OST/heavy/'],
-        ['../wordart_test/', '../test/IC13_1015/', '../test/IC15_2077/']
+        ],
+        # ['../OST/weak/', '../OST/heavy/'],  # OST 데이터 없으면 주석 처리
+        # ['../wordart_test/', '../test/IC13_1015/', '../test/IC15_2077/']  # 추가 데이터 없으면 주석 처리
     ]
     cfg = cfg.cfg
     file_csv = open(

@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info
+dist
+build
+eggs
+.eggs
+*.manifest
+*.spec
+
+# Virtual environments
+venv
+.venv
+env
+.env
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker
+
+# Data & Logs (빌드시 제외, 런타임에 마운트)
+data
+logs
+outputs
+checkpoints
+*.pth
+*.pt
+*.onnx
+*.log
+
+# Build artifacts (런타임에 다시 빌드)
+reference/DAMamba/classification/models/ops_dcnv3/build
+reference/DAMamba/classification/models/ops_dcnv3/*.so
+reference/DAMamba/classification/models/selective_scan/build
+reference/DAMamba/classification/models/selective_scan/*.so
+
+# Documentation
+*.md
+docs
+
+# Tests
+tests
+*_test.py
+test_*.py

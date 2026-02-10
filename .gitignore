@@ -23,8 +23,16 @@ log/
 *.idea
 
 *.log
+nohup.out
 .clang-format
 .clang_format.hook
+
+# Visualization outputs (large files)
+visualization_output*/
+failcase_*/
+
+# Pretrained models (manage separately)
+pretrained/
 
 build/
 dist/

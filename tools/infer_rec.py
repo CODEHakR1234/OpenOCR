@@ -363,18 +363,36 @@ class OpenRecognizer:
             t_cost = time.time() - t_start
             post_results = self.post_process_class(preds,
                                                    torch_tensor=torch_tensor)
+            
+            # Handle GTC format: [gtc_results, ctc_results] -> use ctc_results
+            if (isinstance(post_results, list) and len(post_results) == 2 and 
+                isinstance(post_results[0], list) and isinstance(post_results[1], list)):
+                # GTC format - use CTC results (index 1)
+                post_results = post_results[1]
+            
             for i, post_result in enumerate(post_results):
+                # Handle different post_result formats (CTC vs GTC)
+                if isinstance(post_result, (list, tuple)) and len(post_result) >= 2:
+                    text, score = post_result[0], post_result[1]
+                elif isinstance(post_result, (list, tuple)) and len(post_result) == 1:
+                    text, score = post_result[0], 0.0
+                elif isinstance(post_result, dict):
+                    text = post_result.get('text', post_result.get('rec_text', ''))
+                    score = post_result.get('score', post_result.get('rec_score', 0.0))
+                else:
+                    text, score = str(post_result), 0.0
+                
                 if img_path is not None:
                     info = {
                         'file': batch_file_names[i],
-                        'text': post_result[0],
-                        'score': post_result[1],
+                        'text': text,
+                        'score': score,
                         'elapse': t_cost
                     }
                 else:
                     info = {
-                        'text': post_result[0],
-                        'score': post_result[1],
+                        'text': text,
+                        'score': score,
                         'elapse': t_cost
                     }
                 results.append(info)
